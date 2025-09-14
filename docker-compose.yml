@@ -1,0 +1,31 @@
+version: "3.8"
+
+services:
+  trainer:
+    build: .
+    command: ["python", "src/train.py"]
+    # Mount a host directory to persist model checkpoints and other artifacts
+    volumes:
+      - ./artifacts:/app/artifacts
+    # Uncomment the following lines to enable GPU access if
+    # `nvidia-container-toolkit` is installed on the host
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: ["gpu"]
+
+  api:
+    build: .
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./artifacts:/app/artifacts:ro
+    depends_on:
+      - trainer
+    # Uncomment the following lines to enable GPU access in the API container
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - capabilities: ["gpu"]
